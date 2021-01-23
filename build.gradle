@@ -1,0 +1,61 @@
+/**  설정광련 참고
+ * 1) https://spring.io/guides/gs/gradle/
+ * 2) 스프링 부트와 AWS로 혼자 구현하는 웹 서비스 - 저자) 이동욱
+ * 3) https://bkjeon1614.tistory.com/395
+ * **/
+
+/** 0. gradle task에 대한 전체 의존성을 추가한다.**/
+// ****************************************************************** //
+// buildscript안에다 설정하는 경우는 Gradle Task시 사용되는 라이브러리이다!
+// 즉, gradle 명령어시 아래에 지정한 dependency를 사용한다.
+// ****************************************************************** //
+buildscript {
+    ext{
+        // 2021.01.23 기준 최신 버전 지정해준다.
+        springBootGradleVersion='2.4.2'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootGradleVersion}")
+    }
+}
+// ****************************************************************** //
+// buildscript밖에 설정하는 경우는 모두 소스에 대해 사용하는 라이브러리이다!
+// 즉, 소스에서 dependency를 사용하기 위ㅐ 사용한다.
+// ****************************************************************** //
+/** 1. 사용하는 언어에 대한 선언! **/
+// gradle에 대한 소스 설정을 나타낸다.
+// apply plugin이 'java'일때, build디렉토리에 class, lib.. 등이 생성된다.
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'io.spring.dependency-management'     // 스프링 부트의 의존성을 관리해주는 플러그인!
+apply plugin: 'org.springframework.boot'            // 'Spring Boot' 로 플러그인!
+
+/** 2. dependency를 추가하여 사용 할 수 있도록 설정! **/
+// dependency가 없는 설정을 클래스 파일에서 사용시 dependency가 없어서 에러가 나게 된다.
+// -> Maven Central repository를 통해 종속성을 확인하겠다는 뜻이다.
+repositories {
+    mavenCentral()  // 가장 기본 Default!
+}
+
+// 내가 사용하는 프로젝트의 소스가 적합한 Java Version
+sourceCompatibility = 1.8
+// build시 적용할 Java Version
+targetCompatibility = 1.8
+
+// dependency의 리스트를 선언한다!
+// 1) implementation        : 컴파일,런타임 할때만 dependency를 필요로 한다.          (직접연관된 dependency모두 rebuild)
+// 2) testImplementation    : 테스트컴파일, 테스트런타임 할때만 dependency를 필요로 한다. (직접연관된 dependency모두 rebuild)
+// 3) compile               : 컴파일의 범위가 implementation보다 넒다.     (직, 간접 dependency모두 rebuild)
+// 4) testCompile           : 테스트 컴파일의 범위가 implementation보다 넒다.(직, 간접 dependency모두 rebuild)
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter-batch:2.4.2')
+}
+
+// build시 생성되는 이름과 버전.
+jar {
+    archiveBaseName = 'toy-batch'
+    archiveVersion = '0.0.1'
+}
