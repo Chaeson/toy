@@ -51,7 +51,14 @@ targetCompatibility = 1.8
 // 3) compile               : 컴파일의 범위가 implementation보다 넒다.     (직, 간접 dependency모두 rebuild)
 // 4) testCompile           : 테스트 컴파일의 범위가 implementation보다 넒다.(직, 간접 dependency모두 rebuild)
 dependencies {
+    //lombok
+    compile('org.projectlombok:lombok')
+    annotationProcessor('org.projectlombok:lombok')
+    /** Batch 관련 dependency **/
+    // 참고: https://www.baeldung.com/spring-boot-spring-batch
     compile('org.springframework.boot:spring-boot-starter-batch:2.4.2')
+    //compile('org.mariadb.jdbc:mariadb-java-client')
+    runtime('com.h2database:h2')
 }
 
 // build시 생성되는 이름과 버전.
