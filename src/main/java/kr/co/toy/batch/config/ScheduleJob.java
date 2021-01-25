@@ -32,26 +32,26 @@ import javax.sql.DataSource;
 import java.util.Date;
 
 @Slf4j
-@Configuration
-@EnableBatchProcessing
+//@Configuration
+//@EnableBatchProcessing
 public class ScheduleJob {
 
-    @Autowired
-    JobLauncher jobLauncher;
-
-    @Autowired
-    Job job;
-
-
-    @Scheduled(cron = "*/5 * * * * *")
-    public void perform() throws Exception {
-
-        System.out.println("Job Started at :" + new Date());
-
-        JobParameters param = new JobParametersBuilder().addString("JobID", String.valueOf(System.currentTimeMillis()))
-                .toJobParameters();
-        log.info("JOB LIST: {}", job.getName());
-        if(!job.getName().equals("importUserJob"))
-            jobLauncher.run(job, param);
-    }
+//    @Autowired
+//    JobLauncher jobLauncher;
+//
+//    @Autowired
+//    Job job;
+//
+//
+//    @Scheduled(cron = "*/5 * * * * *")
+//    public void perform() throws Exception {
+//
+//        System.out.println("Job Started at :" + new Date());
+//
+//        JobParameters param = new JobParametersBuilder().addString("JobID", String.valueOf(System.currentTimeMillis()))
+//                .toJobParameters();
+//        log.info("JOB LIST: {}", job.getName());
+//        if(job.getName().equals("importUserJob"))
+//            jobLauncher.run(job, param);
+//    }
 }

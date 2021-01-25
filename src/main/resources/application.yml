@@ -2,8 +2,11 @@ file:
   input: coffee-list.csv
 spring:
   datasource:
-    hikari:
-      jdbc-url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-      username: sa
-      password:
-      driver-class-name: org.h2.Driver
+    url: jdbc:mysql://awsmariadb.cdlzwb1dr7j4.ap-northeast-2.rds.amazonaws.com:3306/test?serverTimezone=UTC&characterEncoding=UTF-8
+    driver-class-name: org.mariadb.jdbc.Driver
+    username: only9984
+    password: 5523978co
+  batch:
+    initialize-schema: always
+server:
+  port: 8080

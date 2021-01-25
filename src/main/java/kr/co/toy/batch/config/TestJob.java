@@ -1,16 +1,21 @@
 package kr.co.toy.batch.config;
 
 import kr.co.toy.batch.domain.Coffee;
+import kr.co.toy.batch.domain.repository.CoffeeRepository;
 import kr.co.toy.batch.listener.JobCompletionNotificationListener;
 import kr.co.toy.batch.process.CoffeeItemProcessor;
+import kr.co.toy.batch.reader.CoffeeItemReader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
+import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
@@ -22,6 +27,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 @Slf4j
 @Configuration
@@ -37,26 +43,20 @@ public class TestJob {
     @Value("${file.input}")
     private String fileInput;
 
+    @Autowired
+    public CoffeeRepository coffeeRepository;
     // 데이터를 읽는 Batch Reader
     // > file.input 프로퍼티의 데이터를 읽는다.
     @Bean
-    public FlatFileItemReader<Coffee> reader(){
-        return new FlatFileItemReaderBuilder<Coffee>().name("coffeeItemReader")
-                .resource(new ClassPathResource(fileInput))
-                .delimited()
-                .names(new String[] {"brand", "origin", "characteristics"})
-                .fieldSetMapper(new BeanWrapperFieldSetMapper<Coffee>(){{
-                    setTargetType(Coffee.class);
-                }})
-                .build();
+    public CoffeeItemReader<Coffee> reader(){
+        List<Coffee> coffeeList = coffeeRepository.findAllByOrigin("Jamaica25");
+        return new CoffeeItemReader<>(coffeeList);
     }
 
     @Bean
-    public JdbcBatchItemWriter<Coffee> writer(DataSource dataSource){
-        return new JdbcBatchItemWriterBuilder<Coffee>().itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .sql("INSERT INTO coffee (brand, origin, characteristics) VALUES (:brand, :origin, :characteristics)")
-                .dataSource(dataSource)
-                .build();
+    public ItemWriter<Coffee> writer(){
+        return ((List<? extends Coffee> coffees) ->
+                coffeeRepository.saveAll(coffees));
     }
 
     @Bean
@@ -69,7 +69,7 @@ public class TestJob {
     }
 
     @Bean
-    public Step step1(JdbcBatchItemWriter<Coffee> writer){
+    public Step step1(ItemWriter<Coffee> writer){
         return stepBuilderFactory.get("step1")
                 .<Coffee, Coffee> chunk(10)
                 .reader(reader())

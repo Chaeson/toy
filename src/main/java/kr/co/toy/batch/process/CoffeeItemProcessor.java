@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 public class CoffeeItemProcessor implements ItemProcessor<Coffee, Coffee> {
 
@@ -12,10 +14,15 @@ public class CoffeeItemProcessor implements ItemProcessor<Coffee, Coffee> {
     @Override
     public Coffee process(Coffee coffee) throws Exception {
         String brand = coffee.getBrand();
-        String origin = coffee.getOrigin();
+        String origin = coffee.getOrigin()+ LocalDateTime.now().getDayOfYear();
         String characteristics = coffee.getCharacteristics().toUpperCase();
+        int seq = coffee.getSeq();
 
-        Coffee transformedCoffee = new Coffee(brand, origin, characteristics);
+        Coffee transformedCoffee = Coffee.builder().brand(brand)
+                .origin(origin)
+                .characteristics(characteristics)
+                .seq(seq)
+                .build();
         log.info("Converting ({}) into ({})", coffee, transformedCoffee);
         return transformedCoffee;
     }
